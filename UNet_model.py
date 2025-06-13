@@ -31,6 +31,8 @@ class DoubleConv(nn.Module):
         def forward(self, x):
             return self.conv(x)  # Apply the convolutional layers to the input tensor x
         
+# UNet model class
+# Main class, defines the architecture except the skip connections
 class UNet(nn.Module):
     def __init__(
             self, in_channels=3, # RGB image input
@@ -45,5 +47,32 @@ class UNet(nn.Module):
         # Down part of the UNet (basically: convolution -> pooling for each feature size) 4 steps of convolution + downsampling
         for feature in features:
             self.downs.append(DoubleConv(in_channels, feature)) # Double Convolution Maps the 3 features of RGB to 64 (First value in features)
-            in_channels = feature # Overwrite in_channels with 
+            in_channels = feature # Overwrite in_channels with the output size of the previous layer
+
+        # Up Part:
+        for feature in reversed(features): # go through the features in reverse, from big to small
+
+            # Upsampling: Transpose convolution (deconvolution) to double the size
+            self.ups.append(
+                # ConvTranspose2d with kernel 2 and stride 2  is the standard "learnable upsampling" layer, it doubles the size of the image
+                nn.ConvTranspose2d(
+                    feature*2, # *2 because the previous layer has 2x the number of features 
+                    feature, # halves the number of features
+                    kernel_size=2,
+                    stride=2
+                )
+            )
+
+            ## Concatenate
+
+            # pass through the double conv
+            self.ups.append(DoubleConv(feature*2, feature))
+        
+        # Bottom of the U
+        # Pass trough double conv and double the last feature size
+        self.bottleneck = DoubleConv(features[-1], features[-1]*2) 
+
+        # Final output layer after up-ladder
+        # 1x1 convolution just maps the last feature size to the output channels
+        self.finalConv = nn.Conv2d(features[0], out_channels, kernel_size=1)
 
