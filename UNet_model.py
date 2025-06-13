@@ -30,3 +30,20 @@ class DoubleConv(nn.Module):
         # Method that applies the layers in the sequential block
         def forward(self, x):
             return self.conv(x)  # Apply the convolutional layers to the input tensor x
+        
+class UNet(nn.Module):
+    def __init__(
+            self, in_channels=3, # RGB image input
+            out_channels=1, # binary mask output
+            features=[64, 128, 256, 512], #
+    ):
+        super(UNet, self).__init__()
+        self.ups = nn.ModuleList() # List of upsampling layers
+        self.downs = nn.ModuleList() # List of downsampling layers
+        self.pool = nn.MaxPool2d(kernel_size=2, stride=2) # Max pooling layer
+
+        # Down part of the UNet (basically: convolution -> pooling for each feature size) 4 steps of convolution + downsampling
+        for feature in features:
+            self.downs.append(DoubleConv(in_channels, feature)) # Double Convolution Maps the 3 features of RGB to 64 (First value in features)
+            in_channels = feature # Overwrite in_channels with 
+
