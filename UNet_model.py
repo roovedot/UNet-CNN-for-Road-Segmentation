@@ -49,6 +49,10 @@ class UNet(nn.Module):
             self.downs.append(DoubleConv(in_channels, feature)) # Double Convolution Maps the 3 features of RGB to 64 (First value in features)
             in_channels = feature # Overwrite in_channels with the output size of the previous layer
 
+        # Bottom of the U
+        # Pass trough double conv and double the last feature size
+        self.bottleneck = DoubleConv(features[-1], features[-1]*2) 
+
         # Up Part:
         for feature in reversed(features): # go through the features in reverse, from big to small
 
@@ -67,12 +71,54 @@ class UNet(nn.Module):
 
             # pass through the double conv
             self.ups.append(DoubleConv(feature*2, feature))
-        
-        # Bottom of the U
-        # Pass trough double conv and double the last feature size
-        self.bottleneck = DoubleConv(features[-1], features[-1]*2) 
 
         # Final output layer after up-ladder
         # 1x1 convolution just maps the last feature size to the output channels
         self.finalConv = nn.Conv2d(features[0], out_channels, kernel_size=1)
 
+    # BUILD THE UNET
+    def forward(self, x):
+        skip_connections = []
+
+        # DOWN LADDER
+
+        # For each down step, in this case 4 steps
+        for down in self.downs:
+            x = down(x) # Apply DoubleConv (blue arrows)
+            skip_connections.append(x) # Save the output for the skip connection (grey arrow)
+            x = self.pool(x) # Maxpooling downsample (red arrow)
+        
+        # BOTTOM
+
+        # Bottleneck (bottom of the U)
+        x = self.bottleneck(x) # Just a DoubleConv, no up or downsampling and no skip connection
+
+        # UP LADDER
+
+        # Reverse Skip connections (order from botto to top)
+        skip_connections = skip_connections[::-1] # reverse list order
+
+        # Iterate on the up steps with step size 2
+        #   In each up, there is 2 items:
+        #       1. Upsampling (ConvTranspose2d)
+        #       2. DoubleConv (which concatenates the skip connection)
+        for idx in range(0, len(self.ups), 2):
+
+            # Upsampling (ConvTranspose2d)
+            x = self.ups[idx](x) 
+
+            # Iterate with step 1 on the skip connections
+            skip_connection = skip_connections[idx // 2] # Get the corresponding skip connection
+
+            # Concatenate along the channel dimension
+            concatInput = torch.cat((skip_connection, x), dim=1) 
+
+            # DoubleConv
+            x = self.ups[idx + 1](concatInput)
+        
+        # FINAL OUTPUT LAYER
+        return self.finalConv(x)
+
+# DEBUG
+unet = UNet(in_channels=3, out_channels=1, features=[64, 128, 256, 512])
+print(unet.ups)
