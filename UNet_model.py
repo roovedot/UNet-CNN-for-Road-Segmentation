@@ -5,6 +5,7 @@ import torchvision.transforms.functional as TF
 # Double convolution block
 class DoubleConv(nn.Module):
     def __init__(self, in_channels, out_channels):
+        r"""Double 3x3 Same Convolution block with Batch Normalization and ReLU activation."""
         super(DoubleConv, self).__init__()
 
         # Double convolution block
@@ -27,19 +28,19 @@ class DoubleConv(nn.Module):
         
         )#self.conv
 
-        # Method that applies the layers in the sequential block
-        def forward(self, x):
-            return self.conv(x)  # Apply the convolutional layers to the input tensor x
+    # Method that applies the layers in the sequential block
+    def forward(self, x):
+        return self.conv(x)  # Apply the convolutional layers to the input tensor x
         
 # UNet model class
-# Main class, defines the architecture except the skip connections
 class UNet(nn.Module):
-    def __init__(
+    def __init__( # Constructor, set default parameters
             self, in_channels=3, # RGB image input
             out_channels=1, # binary mask output
-            features=[64, 128, 256, 512], #
+            features=[64, 128, 256, 512], 
     ):
-        super(UNet, self).__init__()
+        super(UNet, self).__init__() #Initialize the parent class nn.Module
+
         self.ups = nn.ModuleList() # List of upsampling layers
         self.downs = nn.ModuleList() # List of downsampling layers
         self.pool = nn.MaxPool2d(kernel_size=2, stride=2) # Max pooling layer
@@ -110,6 +111,17 @@ class UNet(nn.Module):
             # Iterate with step 1 on the skip connections
             skip_connection = skip_connections[idx // 2] # Get the corresponding skip connection
 
+            # Protection against input sizes not divisible by 16
+            #   If input is n not divisible by 16, (by 2 4 times),
+            #   Maxpool will flatten the image (eg. 161x161 to 80x80)
+            #   Upsampling will double the size (eg. 80x80 to 160x160)
+            #   But the skip_connection will still be 161x161
+            if x.shape != skip_connection.shape:
+                # Resize x to match the original shape (other options woud be adding padding or cropping, would be useful to compare performance between the three)
+                #   tensor.shape is an array of [batch_size, channels, height, width]
+                #   [2:] will grab all items from index 2 (height) to the end 
+                x = TF.resize(x, size=skip_connection.shape[2:]) 
+
             # Concatenate along the channel dimension
             concatInput = torch.cat((skip_connection, x), dim=1) 
 
@@ -120,5 +132,14 @@ class UNet(nn.Module):
         return self.finalConv(x)
 
 # DEBUG
-unet = UNet(in_channels=3, out_channels=1, features=[64, 128, 256, 512])
-print(unet.ups)
+def test():
+    # Testing edge cases
+    x = torch.randn((3, 2, 479, 521))  # Batch size of 3, 2 channels, 479x521 image
+    model = UNet(in_channels=2, out_channels=1) # Default parameters: in_channels=3, out_channels=1, features=[64, 128, 256, 512]
+
+    preds = model(x)  # Forward pass (Because Unet is a subclass of nn.Module, this calls the forward() method)
+    print(f"Input shape: {x.shape}")
+    print(f"Output shape: {preds.shape}")  # Should be [3, 1, 479, 521] if out_channels=1
+
+if __name__ == "__main__":
+    test()
