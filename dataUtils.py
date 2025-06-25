@@ -7,7 +7,17 @@ I'll try to make it as modular and universal as possible, but
 import os
 import shutil
 import re
-import sys
+import config
+
+def move_file(file_path, out_dir):
+            print(f"Moving file: {file_path} to {out_dir}")
+            try:
+                if not os.path.exists(out_dir):
+                    os.makedirs(out_dir, exist_ok=True)
+                    print(f"Created output directory {out_dir}.")
+                shutil.move(file_path, out_dir)
+            except Exception as e:
+                print(f"Error moving file {file_path}: {e}")
 
 def move_files_filtered(src_dir, out_dir, filter = None, dont_ask = False):
     r"""
@@ -51,6 +61,7 @@ def move_files_filtered(src_dir, out_dir, filter = None, dont_ask = False):
         raise FileNotFoundError(f"Source directory {src_dir} does not exist.")
     if not os.path.exists(out_dir):
         os.makedirs(out_dir, exist_ok=True)
+        print(f"Created output directory {out_dir}.")
     else:
         print(f"Output directory {out_dir} already exists. Files will be moved into it.")
     
@@ -68,14 +79,6 @@ def move_files_filtered(src_dir, out_dir, filter = None, dont_ask = False):
 
         print(f"Moving files from {src_dir} to {out_dir}. If you don't see any 'Moving file' messages, means no files in {src_dir} matched the filter.")
         print("--------------------------------------------------------------------------------")
-
-        # Sub-function to move a single file
-        def move_file(file_path, out_dir):
-            print(f"Moving file: {file_path} to {out_dir}")
-            try:
-                shutil.move(file_path, out_dir)
-            except Exception as e:
-                print(f"Error moving file {file_path}: {e}")
 
         # Crawl src_dir recursively
         for dirpath, dirnames, fileNames in os.walk(src_dir):
@@ -115,9 +118,42 @@ def test_move_files_filtered():
 
     move_files_filtered(src_dir, out_dir, filter, dont_ask=True)
 
+def purge_images():
+    """
+    TODO: select only images that have a corresponding label file
+    """
+    labels_dir = config.DATA_ROOT_DIR + "CS_trainLabels"
+    images_dir = config.DATA_ROOT_DIR + "images/train_extended"
+    out_dir = config.DATA_ROOT_DIR + "images/train"
+
+    # Match label files and save the fileId eg. (aachen_000001_000019)
+    filter = re.compile(r'^(?P<fileId>.*)_gtFine_labelIds.png$')
+
+    for dirpath, dirnames, fileNames in os.walk(labels_dir):
+        for fileName in fileNames:
+            m = filter.match(fileName)
+            if m: # In case there is weird files
+
+                # save fileId
+                fileId = m.group('fileId') 
+                print(f"Processing fileId: {fileId}") #Debug
+
+                # Build corresponding image file path
+                imgPath = os.path.join(images_dir, fileId + "_leftImg8bit.png")
+                if os.path.exists(imgPath):
+                    print(f"Moving image: {fileId} to {out_dir}")
+                    move_file(imgPath, out_dir)
+                else:
+                    print(f"Image file {imgPath} does not exist. Skipping.")
+            else:
+                print(f"File {fileName} does not match the filter. Skipping.")
+
+
+
+# Main (just for testing and debugging purposes)
 if __name__ == "__main__":
     # Uncomment to test the function
-    test_move_files_filtered()
+    # test_move_files_filtered()
 
     r'''Reuse images from another proyect
     move_files_filtered(
@@ -126,4 +162,16 @@ if __name__ == "__main__":
         filter=r'.*\.png$')
     '''
 
-    pass
+    # Figuring out how regex groups work
+    '''
+    stringPrueba = "aachen_000001_000019_gtFine_labelIds.png"
+
+    filtro= r'^(?P<fileId>.*)_gtFine_labelIds.png$'
+    compilado = re.compile(filtro)
+    m = compilado.match(stringPrueba)
+    print(m.groupdict(0))
+    print("groups: "+m.group('fileId'))
+    '''
+
+    # Uncomment to purge images
+    # purge_images()
