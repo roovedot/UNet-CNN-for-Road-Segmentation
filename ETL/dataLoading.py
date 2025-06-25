@@ -15,14 +15,14 @@ def organise_label_data():
     dataUtils.move_files_filtered(
         src_dir=testLabels,
         out_dir=trainOut,
-        filter=r'.*instanceIds\.png$',
+        filter=r'.*labelIds\.png$',
     )
     
     print("ABOUT TO GET TRAIN LABELS:")
     dataUtils.move_files_filtered(
         src_dir=trainLabels,
         out_dir=trainOut,
-        filter=r'.*instanceIds\.png$',    
+        filter=r'.*labelIds\.png$',    
     )
 
     # Move val labels
@@ -30,10 +30,8 @@ def organise_label_data():
     dataUtils.move_files_filtered(
         src_dir=valLabels,
         out_dir=valOut,
-        filter=r'.*instanceIds\.png$',
+        filter=r'.*labelIds\.png$',
     ) 
-
-#TODO: There are 2 train labels with no corresponding image
 
 if __name__ == "__main__":
     # Get the labels we are going to use from cityscapes dataset
