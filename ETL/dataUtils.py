@@ -1,7 +1,7 @@
 '''
 Methods to help organise the data in cityscapes.
 I'll try to make it as modular and universal as possible, but 
- you will have to adapt it to your needs.
+ some are pretty specific to this project and my particular needs.
 '''
 
 import os
@@ -21,7 +21,7 @@ def move_file(file_path, out_dir):
 
 def move_files_filtered(src_dir, out_dir, filter = None, dont_ask = False):
     r"""
-    Moves files from src_dir to out_dir that match the filter "string" 
+    Moves files from src_dir to out_dir that match the regular expression filter 
     
     :param filter: Regular Expression to filter files by. eg. <<< ".*gtFine_labelIds\.png$" (full name of file ending in gtFine_labelIds.png). >>> Recommend testing in https://regex101.com/ before using.
     :param src_dir: Directory to recursively search for files
@@ -68,7 +68,7 @@ def move_files_filtered(src_dir, out_dir, filter = None, dont_ask = False):
     # Ask for confirmation before proceeding 
     if not dont_ask:
         userResponse = input("Do you want to proceed? (y/n): ").strip().lower()
-        if userResponse not in ("y", "yes", "Y"):
+        if userResponse not in ("y", "yes"):
             print("Operation cancelled by user.")
             cancelled = True
 
