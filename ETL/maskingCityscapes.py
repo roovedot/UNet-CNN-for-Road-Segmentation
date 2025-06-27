@@ -1,3 +1,9 @@
+'''
+    CREATE BINARY MASK LABELS FROM CITYSCAPES DATA
+    Takes the multiclass label_id mask images from Cityscapes dataset and creates binary masks for a specific target value.
+    Run after dataLoading.py 
+'''
+
 from PIL import Image
 import numpy as np
 import dataConfig as dataConfig
@@ -127,6 +133,7 @@ if __name__ == '__main__':
         out_dir = dataConfig.DATA_ROOT_DIR + "binMasks/val/"
         batch_binMask(originalMasksDir, out_dir)
 
+    # make Binary Masks for Train Labels
     def binMaskTrainLabels():
         originalMasksDir = dataConfig.CITYSCAPES_ROOT_DIR + "CS_trainLabels/"
         out_dir = dataConfig.DATA_ROOT_DIR + "binMasks/train/"

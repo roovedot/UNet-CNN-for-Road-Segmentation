@@ -118,17 +118,19 @@ def test_move_files_filtered():
 
     move_files_filtered(src_dir, out_dir, filter, dont_ask=True)
 
-def purge_images():
-    """
-    TODO: select only images that have a corresponding label file
-    """
-    labels_dir = dataConfig.DATA_ROOT_DIR + "CS_trainLabels"
-    images_dir = dataConfig.DATA_ROOT_DIR + "images/train_extended"
+def purge_images(
+    labels_dir = dataConfig.DATA_ROOT_DIR + "CS_trainLabels",
+    images_dir = dataConfig.DATA_ROOT_DIR + "images/train_extended",
     out_dir = dataConfig.DATA_ROOT_DIR + "images/train"
-
+    ):
+    """
+    Selects only images that have a corresponding label file
+    """
+    
     # Match label files and save the fileId eg. (aachen_000001_000019)
     filter = re.compile(r'^(?P<fileId>.*)_gtFine_labelIds.png$')
 
+    # Crawl the labels directory
     for dirpath, dirnames, fileNames in os.walk(labels_dir):
         for fileName in fileNames:
             m = filter.match(fileName)
@@ -141,7 +143,7 @@ def purge_images():
                 # Build corresponding image file path
                 imgPath = os.path.join(images_dir, fileId + "_leftImg8bit.png")
                 if os.path.exists(imgPath):
-                    print(f"Moving image: {fileId} to {out_dir}")
+                    print(f"Moving image: {fileId} to {out_dir}") #Debug
                     move_file(imgPath, out_dir)
                 else:
                     print(f"Image file {imgPath} does not exist. Skipping.")

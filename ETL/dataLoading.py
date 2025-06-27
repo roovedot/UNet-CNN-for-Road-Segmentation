@@ -1,3 +1,7 @@
+'''
+    PICKS THE _labelIds.png MULTICLASS MASKS FROM CITYSCAPES DATASET AND SEPARATES THEM INTO TRAIN AND VAL LABEL DIRECTORIES
+'''
+
 import dataUtils # Utils made for this project
 import UNet.ETL.dataConfig as dataConfig # Config File
 import os
@@ -7,6 +11,7 @@ def organise_label_data():
     trainLabels = dataConfig.CITYSCAPES_ROOT_DIR + "gtFine_trainvaltest/gtFine/train"
     valLabels = dataConfig.CITYSCAPES_ROOT_DIR + "gtFine_trainvaltest/gtFine/val"
     
+    # Directories where we will store the labels
     trainOut = dataConfig.DATA_ROOT_DIR + "/CS_trainLabels"
     valOut = dataConfig.DATA_ROOT_DIR + "/CS_valLabels"
 
