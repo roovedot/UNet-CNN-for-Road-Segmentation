@@ -7,7 +7,7 @@ I'll try to make it as modular and universal as possible, but
 import os
 import shutil
 import re
-import config
+import UNet.ETL.dataConfig as dataConfig
 
 def move_file(file_path, out_dir):
             print(f"Moving file: {file_path} to {out_dir}")
@@ -122,9 +122,9 @@ def purge_images():
     """
     TODO: select only images that have a corresponding label file
     """
-    labels_dir = config.DATA_ROOT_DIR + "CS_trainLabels"
-    images_dir = config.DATA_ROOT_DIR + "images/train_extended"
-    out_dir = config.DATA_ROOT_DIR + "images/train"
+    labels_dir = dataConfig.DATA_ROOT_DIR + "CS_trainLabels"
+    images_dir = dataConfig.DATA_ROOT_DIR + "images/train_extended"
+    out_dir = dataConfig.DATA_ROOT_DIR + "images/train"
 
     # Match label files and save the fileId eg. (aachen_000001_000019)
     filter = re.compile(r'^(?P<fileId>.*)_gtFine_labelIds.png$')
@@ -132,7 +132,7 @@ def purge_images():
     for dirpath, dirnames, fileNames in os.walk(labels_dir):
         for fileName in fileNames:
             m = filter.match(fileName)
-            if m: # In case there is weird files
+            if m: # Make sure the fileName matches the filter 
 
                 # save fileId
                 fileId = m.group('fileId') 

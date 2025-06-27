@@ -1,14 +1,14 @@
 import dataUtils # Utils made for this project
-import config # Config File
+import UNet.ETL.dataConfig as dataConfig # Config File
 import os
 
 def organise_label_data():
-    testLabels = config.CITYSCAPES_ROOT_DIR + "gtFine_trainvaltest/gtFine/test"
-    trainLabels = config.CITYSCAPES_ROOT_DIR + "gtFine_trainvaltest/gtFine/train"
-    valLabels = config.CITYSCAPES_ROOT_DIR + "gtFine_trainvaltest/gtFine/val"
+    testLabels = dataConfig.CITYSCAPES_ROOT_DIR + "gtFine_trainvaltest/gtFine/test"
+    trainLabels = dataConfig.CITYSCAPES_ROOT_DIR + "gtFine_trainvaltest/gtFine/train"
+    valLabels = dataConfig.CITYSCAPES_ROOT_DIR + "gtFine_trainvaltest/gtFine/val"
     
-    trainOut = config.DATA_ROOT_DIR + "/CS_trainLabels"
-    valOut = config.DATA_ROOT_DIR + "/CS_valLabels"
+    trainOut = dataConfig.DATA_ROOT_DIR + "/CS_trainLabels"
+    valOut = dataConfig.DATA_ROOT_DIR + "/CS_valLabels"
 
     # Move train labels (we are joining train and test labels)
     print("ABOUT TO GET TEST LABELS:")
