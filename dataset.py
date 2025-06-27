@@ -2,10 +2,9 @@ import os
 from PIL import Image
 from torch.utils.data import Dataset
 import numpy as np
-import unetConfig
 
 class RoadSegDataset(Dataset):
-    def __init__(self, image_dir=unetConfig.IMG_TRAIN_DIR, mask_dir=unetConfig.BINMASK_TRAIN_DIR, transform=None):
+    def __init__(self, image_dir, mask_dir, transform=None):
         #super().__init__()
         self.image_dir = image_dir
         self.mask_dir = mask_dir
@@ -33,11 +32,3 @@ class RoadSegDataset(Dataset):
             mask = augmentations["mask"]
         
         return image, mask
-    
-
-
-if __name__ == '__main__':
-    dataset = RoadSegDataset()
-
-    # aachen_000000_000019_leftImg8bit.png
-    # aachen_000000_000019_binMask.png
