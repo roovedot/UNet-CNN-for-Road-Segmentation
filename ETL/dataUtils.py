@@ -7,7 +7,7 @@ I'll try to make it as modular and universal as possible, but
 import os
 import shutil
 import re
-import UNet.ETL.dataConfig as dataConfig
+import dataConfig
 
 def move_file(file_path, out_dir):
             print(f"Moving file: {file_path} to {out_dir}")

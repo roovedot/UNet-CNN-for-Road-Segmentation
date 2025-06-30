@@ -6,7 +6,7 @@
 
 from PIL import Image
 import numpy as np
-import dataConfig as dataConfig
+import dataConfig
 import os
 import re
 
