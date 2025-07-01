@@ -6,7 +6,7 @@ A lightweight PyTorch implementation of the U‑Net architecture for semantic se
 
 For a detailed project overview, architecture diagrams, code explanations, and next steps, please refer to the full write‑up (PDF):
 
-[UNet CNN for Road Segmentation Documentation (Public Notion Page)](https://massive-birch-56b.notion.site/UNet-CNN-for-road-segmentation-1bfd04bb9417808c9a96f42df9f03984?pvs=74)
+UNet CNN for Road Segmentation Documentation (Public Notion Page) --> (https://massive-birch-56b.notion.site/UNet-CNN-for-road-segmentation-1bfd04bb9417808c9a96f42df9f03984?pvs=74)
 
 ## 🛠️ Project Structure
 
